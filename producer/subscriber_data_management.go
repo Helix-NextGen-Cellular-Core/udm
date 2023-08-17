@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/antihax/optional"
 
@@ -25,8 +26,8 @@ import (
 
 func HandleGetAmDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	logger.SdmLog.Infof("Handle GetAmData")
-
+	// logger.SdmLog.Infof("Handle GetAmData")
+	st := time.Now().UnixNano()
 	// step 2: retrieve request
 	supi := request.Params["supi"]
 	plmnID := request.Query.Get("plmn-id")
@@ -34,7 +35,7 @@ func HandleGetAmDataRequest(request *http_wrapper.Request) *http_wrapper.Respons
 
 	// step 3: handle the message
 	response, problemDetails := getAmDataProcedure(supi, plmnID, supportedFeatures)
-
+	logger.SdmLog.Infof("supi %v HandleGetAmDataRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -621,8 +622,8 @@ func getSmDataProcedure(supi string, plmnID string, Dnn string, Snssai string, s
 
 func HandleGetNssaiRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	logger.SdmLog.Infof("Handle GetNssai")
-
+	// logger.SdmLog.Infof("Handle GetNssai")
+	st := time.Now().UnixNano()
 	// step 2: retrieve request
 	supi := request.Params["supi"]
 	plmnID := request.Query.Get("plmn-id")
@@ -630,7 +631,7 @@ func HandleGetNssaiRequest(request *http_wrapper.Request) *http_wrapper.Response
 
 	// step 3: handle the message
 	response, problemDetails := getNssaiProcedure(supi, plmnID, supportedFeatures)
-
+	logger.SdmLog.Infof("ueID %v HandleGetNssaiRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -696,8 +697,8 @@ func getNssaiProcedure(supi string, plmnID string, supportedFeatures string) (
 
 func HandleGetSmfSelectDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	logger.SdmLog.Infof("Handle GetSmfSelectData")
-
+	// logger.SdmLog.Infof("Handle GetSmfSelectData")
+	st := time.Now().UnixNano()
 	// step 2: retrieve request
 	supi := request.Params["supi"]
 	plmnID := request.Query.Get("plmn-id")
@@ -705,7 +706,7 @@ func HandleGetSmfSelectDataRequest(request *http_wrapper.Request) *http_wrapper.
 
 	// step 3: handle the message
 	response, problemDetails := getSmfSelectDataProcedure(supi, plmnID, supportedFeatures)
-
+	logger.SdmLog.Infof("ueID %v HandleGetSmfSelectDataRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -772,14 +773,14 @@ func getSmfSelectDataProcedure(supi string, plmnID string, supportedFeatures str
 
 func HandleSubscribeToSharedDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	logger.SdmLog.Infof("Handle SubscribeToSharedData")
-
+	// logger.SdmLog.Infof("Handle SubscribeToSharedData")
+	st := time.Now().UnixNano()
 	// step 2: retrieve request
 	sdmSubscription := request.Body.(models.SdmSubscription)
 
 	// step 3: handle the message
 	header, response, problemDetails := subscribeToSharedDataProcedure(&sdmSubscription)
-
+	logger.SdmLog.Infof("ueID %v HandleSubscribeToSharedDataRequest took: %d ", (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -843,15 +844,15 @@ func subscribeToSharedDataProcedure(sdmSubscription *models.SdmSubscription) (
 
 func HandleSubscribeRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	logger.SdmLog.Infof("Handle Subscribe")
-
+	// logger.SdmLog.Infof("Handle Subscribe")
+	st := time.Now().UnixNano()
 	// step 2: retrieve request
 	sdmSubscription := request.Body.(models.SdmSubscription)
 	supi := request.Params["supi"]
 
 	// step 3: handle the message
 	header, response, problemDetails := subscribeProcedure(&sdmSubscription, supi)
-
+	logger.SdmLog.Infof("ueID %v HandleSubscribeRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -1250,8 +1251,8 @@ func getTraceDataProcedure(supi string, plmnID string) (
 
 func HandleGetUeContextInSmfDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	logger.SdmLog.Infof("Handle GetUeContextInSmfData")
-
+	// logger.SdmLog.Infof("Handle GetUeContextInSmfData")
+	st := time.Now().UnixNano()
 	// step 2: retrieve request
 	supi := request.Params["supi"]
 	supportedFeatures := request.Query.Get("supported-features")
@@ -1270,6 +1271,7 @@ func HandleGetUeContextInSmfDataRequest(request *http_wrapper.Request) *http_wra
 		Status: http.StatusForbidden,
 		Cause:  "UNSPECIFIED",
 	}
+	logger.SdmLog.Infof("ueID %v HandleGetUeContextInSmfDataRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	return http_wrapper.NewResponse(http.StatusForbidden, nil, problemDetails)
 }
 

@@ -86,7 +86,7 @@ func twoLayerPathHandlerFunc(c *gin.Context) {
 		HTTPGetIdTranslationResult(c)
 		return
 	}
-
+	//// TODoBilal Check if this is needed or could be made more better
 	for _, route := range twoLayerPathRouter {
 		if strings.Contains(route.Pattern, op) && route.Method == c.Request.Method {
 			route.HandlerFunc(c)

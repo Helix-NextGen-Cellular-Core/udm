@@ -90,15 +90,15 @@ func strictHex(s string, n int) string {
 
 func HandleGenerateAuthDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	logger.UeauLog.Infoln("Handle GenerateAuthDataRequest")
-
+	// logger.UeauLog.Infoln("Handle GenerateAuthDataRequest")
+	st := time.Now().UnixNano()
 	// step 2: retrieve request
 	authInfoRequest := request.Body.(models.AuthenticationInfoRequest)
 	supiOrSuci := request.Params["supiOrSuci"]
 
 	// step 3: handle the message
 	response, problemDetails := GenerateAuthDataProcedure(authInfoRequest, supiOrSuci)
-
+	logger.UeauLog.Infof("ueID %v HandleGenerateAuthDataRequest took: %d ", supiOrSuci, (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -114,13 +114,13 @@ func HandleGenerateAuthDataRequest(request *http_wrapper.Request) *http_wrapper.
 }
 
 func HandleConfirmAuthDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
-	logger.UeauLog.Infoln("Handle ConfirmAuthDataRequest")
-
+	// logger.UeauLog.Infoln("Handle ConfirmAuthDataRequest")
+	st := time.Now().UnixNano()
 	authEvent := request.Body.(models.AuthEvent)
 	supi := request.Params["supi"]
 
 	problemDetails := ConfirmAuthDataProcedure(authEvent, supi)
-
+	logger.UeauLog.Infof("ueID %v HandleConfirmAuthDataRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	if problemDetails != nil {
 		return http_wrapper.NewResponse(int(problemDetails.Status), nil, problemDetails)
 	} else {

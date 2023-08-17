@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/antihax/optional"
 
@@ -190,8 +191,8 @@ func GetAmfNon3gppAccessProcedure(queryAmfContextNon3gppParamOpts Nudr_DataRepos
 
 func HandleRegistrationAmf3gppAccessRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	logger.UecmLog.Infof("Handle RegistrationAmf3gppAccess")
-
+	// logger.UecmLog.Infof("Handle RegistrationAmf3gppAccess")
+	st := time.Now().UnixNano()
 	// step 2: retrieve request
 	registerRequest := request.Body.(models.Amf3GppAccessRegistration)
 	ueID := request.Params["ueId"]
@@ -199,7 +200,7 @@ func HandleRegistrationAmf3gppAccessRequest(request *http_wrapper.Request) *http
 
 	// step 3: handle the message
 	header, response, problemDetails := RegistrationAmf3gppAccessProcedure(registerRequest, ueID)
-
+	logger.UecmLog.Infof("ueID %v HandleRegistrationAmf3gppAccessRequest took: %d ", ueID, (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
