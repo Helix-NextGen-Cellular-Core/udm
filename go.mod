@@ -15,12 +15,12 @@ require (
 	github.com/omec-project/idgenerator v1.1.0
 	github.com/omec-project/logger_util v1.1.0
 	github.com/omec-project/milenage v1.1.0
+	github.com/omec-project/nrf v1.0.1
 	github.com/omec-project/openapi v1.1.0
 	github.com/omec-project/path_util v1.1.0
 	github.com/omec-project/util_3gpp v1.1.1
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/urfave/cli v1.22.5
-	google.golang.org/grpc v1.48.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )

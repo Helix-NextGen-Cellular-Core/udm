@@ -83,4 +83,11 @@ var routes = Routes{
 		"/sdm-subscriptions",
 		HTTPDataChangeNotificationToNF,
 	},
+
+	{
+		"NfStatusNotify",
+		"POST",
+		"/nf-status-notify",
+		HTTPNfSubscriptionStatusNotify,
+	},
 }

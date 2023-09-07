@@ -17,8 +17,11 @@ import (
 	"time"
 
 	"github.com/omec-project/openapi/models"
+	udm_context "github.com/omec-project/udm/context"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
+
+	nrf_cache "github.com/omec-project/nrf/nrfcache"
 
 	"github.com/omec-project/config5g/proto/client"
 	protos "github.com/omec-project/config5g/proto/sdcoreConfig"
@@ -209,6 +212,10 @@ func (udm *UDM) Start() {
 	addr := fmt.Sprintf("%s:%d", self.BindingIPv4, self.SBIPort)
 
 	go udm.registerNF()
+	if self.EnableNrfCaching {
+		initLog.Infof("Enable NRF caching feature for %d seconds", self.NrfCacheEvictionInterval)
+		nrf_cache.InitNrfCaching(self.NrfCacheEvictionInterval*time.Second, consumer.SendNfDiscoveryToNrf)
+	}
 
 	signalChannel := make(chan os.Signal, 1)
 	signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM)
@@ -297,6 +304,21 @@ func (udm *UDM) Terminate() {
 	} else {
 		logger.InitLog.Infof("Deregister from NRF successfully")
 	}
+	self := udm_context.UDM_Self()
+	self.NfStatusSubscriptions.Range(func(nfInstanceId, v interface{}) bool {
+		if subscriptionId, ok := self.NfStatusSubscriptions.Load(nfInstanceId); ok {
+			logger.InitLog.Debugf("SubscriptionId is %v", subscriptionId.(string))
+			problemDetails, err := consumer.SendRemoveSubscription(subscriptionId.(string))
+			if problemDetails != nil {
+				logger.InitLog.Errorf("Remove NF Subscription Failed Problem[%+v]", problemDetails)
+			} else if err != nil {
+				logger.InitLog.Errorf("Remove NF Subscription Error[%+v]", err)
+			} else {
+				logger.InitLog.Infoln("[UDM] Remove NF Subscription successful")
+			}
+		}
+		return true
+	})
 	logger.InitLog.Infof("UDM terminated")
 }
 
@@ -443,7 +465,7 @@ func (udm *UDM) registerNF() {
 				logger.InitLog.Errorln(err1.Error())
 			} else {
 				udm.StartKeepAliveTimer(prof)
-				logger.CfgLog.Infof("Sent Register NF Instance with updated profile")
+				logger.CfgLog.Infof("Sent Register NF Instance with updated profile %s", newNrfUri)
 				self.NrfUri = newNrfUri
 			}
 		}

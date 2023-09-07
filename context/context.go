@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/omec-project/idgenerator"
 	"github.com/omec-project/openapi"
@@ -53,6 +54,10 @@ type UDMContext struct {
 	Keys                           *factory.Keys
 	EeSubscriptionIDGenerator      *idgenerator.IDGenerator
 	PlmnList                       []factory.PlmnSupportItem
+	EnableNrfCaching               bool
+	NrfCacheEvictionInterval       time.Duration
+	NfStatusSubscriptions          sync.Map
+	EnableScaling                  bool
 }
 
 type UdmUeContext struct {

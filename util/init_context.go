@@ -8,6 +8,7 @@ package util
 
 import (
 	"os"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -34,7 +35,7 @@ func InitUDMContext(udmContext *context.UDMContext) {
 			udmContext.UriScheme = models.UriScheme(sbi.Scheme)
 		}
 		if sbi.RegisterIPv4 != "" {
-			udmContext.RegisterIPv4 = sbi.RegisterIPv4
+			udmContext.RegisterIPv4 = os.Getenv("POD_IP") //sbi.RegisterIPv4
 		}
 		if sbi.Port != 0 {
 			udmContext.SBIPort = sbi.Port
@@ -56,5 +57,14 @@ func InitUDMContext(udmContext *context.UDMContext) {
 
 	udmContext.Keys = configuration.Keys
 	udmContext.PlmnList = configuration.PlmnList
+	udmContext.EnableScaling = configuration.EnableScaling
+	udmContext.EnableNrfCaching = configuration.EnableNrfCaching
+	if configuration.EnableNrfCaching {
+		if configuration.NrfCacheEvictionInterval == 0 {
+			udmContext.NrfCacheEvictionInterval = time.Duration(900) // 15 mins
+		} else {
+			udmContext.NrfCacheEvictionInterval = time.Duration(configuration.NrfCacheEvictionInterval)
+		}
+	}
 	udmContext.InitNFService(servingNameList, config.Info.Version)
 }

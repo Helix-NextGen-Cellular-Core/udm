@@ -37,13 +37,16 @@ const (
 )
 
 type Configuration struct {
-	UdmName         string            `yaml:"udmName,omitempty"`
-	Sbi             *Sbi              `yaml:"sbi,omitempty"`
-	ServiceNameList []string          `yaml:"serviceNameList,omitempty"`
-	NrfUri          string            `yaml:"nrfUri,omitempty"`
-	Keys            *Keys             `yaml:"keys,omitempty"`
-	PlmnSupportList []models.PlmnId   `yaml:"plmnSupportList,omitempty"`
-	PlmnList        []PlmnSupportItem `yaml:"plmnList,omitempty"`
+	UdmName                  string            `yaml:"udmName,omitempty"`
+	Sbi                      *Sbi              `yaml:"sbi,omitempty"`
+	ServiceNameList          []string          `yaml:"serviceNameList,omitempty"`
+	NrfUri                   string            `yaml:"nrfUri,omitempty"`
+	Keys                     *Keys             `yaml:"keys,omitempty"`
+	PlmnSupportList          []models.PlmnId   `yaml:"plmnSupportList,omitempty"`
+	PlmnList                 []PlmnSupportItem `yaml:"plmnList,omitempty"`
+	EnableNrfCaching         bool              `yaml:"enableNrfCaching"`
+	NrfCacheEvictionInterval int               `yaml:"nrfCacheEvictionInterval,omitempty"`
+	EnableScaling            bool              `yaml:"enableScaling,omitempty"`
 }
 
 type Sbi struct {
