@@ -8,9 +8,8 @@ package consumer
 import (
 	"context"
 	"fmt"
-	"hash/fnv"
+	"math"
 	"net/http"
-	"sort"
 
 	"github.com/antihax/optional"
 	nrf_cache "github.com/omec-project/nrf/nrfcache"
@@ -106,6 +105,11 @@ func SendNfDiscoveryToNrf(nrfUri string, targetNfType, requestNfType models.NfTy
 }
 func SendNFIntancesUDR(id string, types int) string {
 	self := udm_context.UDM_Self()
+	Uenf, ok := self.UeNfProfile.Load(id)
+	if ok {
+		nf1 := Uenf.(*models.NfProfile)
+		return util.SearchNFServiceUri(*nf1, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
+	}
 	targetNfType := models.NfType_UDR
 	requestNfType := models.NfType_UDM
 	localVarOptionals := Nnrf_NFDiscovery.SearchNFInstancesParamOpts{
@@ -120,35 +124,54 @@ func SendNFIntancesUDR(id string, types int) string {
 	// case NFDiscoveryToUDRParamGpsi:
 	// 	localVarOptionals.Gpsi = optional.NewString(id)
 	// }
-	fmt.Println(self.NrfUri)
+	// fmt.Println(self.NrfUri)
 	result, err := SendNFInstances(self.NrfUri, targetNfType, requestNfType, &localVarOptionals)
 	if err != nil {
 		logger.Handlelog.Error(err.Error())
 		return ""
 	}
-	nfInstanceIds := make([]string, 0, len(result.NfInstances))
-	for _, profile := range result.NfInstances {
-		nfInstanceIds = append(nfInstanceIds, profile.NfInstanceId)
-	}
-	sort.Strings(nfInstanceIds)
+	// nfInstanceIds := make([]string, 0, len(result.NfInstances))
+	// for _, profile := range result.NfInstances {
+	// 	nfInstanceIds = append(nfInstanceIds, profile.NfInstanceId)
+	// }
+	// sort.Strings(nfInstanceIds)
 
-	nfInstanceIdIndexMap := make(map[string]int)
-	for index, value := range nfInstanceIds {
-		nfInstanceIdIndexMap[value] = index
+	// nfInstanceIdIndexMap := make(map[string]int)
+	// for index, value := range nfInstanceIds {
+	// 	nfInstanceIdIndexMap[value] = index
+	// }
+	// nfInstanceIndex := 0
+	// if self.EnableScaling {
+	// 	h := fnv.New32a()
+	// 	h.Write([]byte(id))
+	// 	key := int(h.Sum32())
+	// 	nfInstanceIndex = key % len(result.NfInstances)
+	// }
+	// for _, profile := range result.NfInstances {
+	// 	if nfInstanceIndex != nfInstanceIdIndexMap[profile.NfInstanceId] {
+	// 		continue
+	// 	}
+	// 	//logge
+	// 	return util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
+	// }
+
+	min := int(math.MaxInt64)
+	nf := models.NfProfile{}
+	self.NfProfileListMutex.Lock()
+	if self.NfProfileList[models.NfType_UDR] == nil {
+		self.NfProfileList[models.NfType_UDR] = make(map[string]int)
 	}
-	nfInstanceIndex := 0
-	if self.EnableScaling {
-		h := fnv.New32a()
-		h.Write([]byte(id))
-		key := int(h.Sum32())
-		nfInstanceIndex = key % len(result.NfInstances)
-	}
-	for _, profile := range result.NfInstances {
-		if nfInstanceIndex != nfInstanceIdIndexMap[profile.NfInstanceId] {
-			continue
+	for _, nfProfile := range result.NfInstances {
+		if self.NfProfileList[models.NfType_UDR][nfProfile.NfInstanceId] < min {
+			nf = nfProfile
+			min = self.NfProfileList[models.NfType_UDR][nfProfile.NfInstanceId]
 		}
-		//logge
-		return util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 	}
-	return ""
+	self.NfProfileList[models.NfType_UDR][nf.NfInstanceId]++
+	count := self.NfProfileList[models.NfType_UDR][nf.NfInstanceId]
+	self.UeNfProfile.Store(id, &nf)
+	self.NfProfileListMutex.Unlock()
+	fmt.Println("for Ue: ", id, " for targetNfType ", string(models.NfType_UDR), " NF is: ", nf, "nf Count:", count)
+
+	return util.SearchNFServiceUri(nf, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 }

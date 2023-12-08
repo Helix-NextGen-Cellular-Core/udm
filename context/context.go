@@ -58,6 +58,9 @@ type UDMContext struct {
 	NrfCacheEvictionInterval       time.Duration
 	NfStatusSubscriptions          sync.Map
 	EnableScaling                  bool
+	NfProfileList                  map[models.NfType]map[string]int
+	NfProfileListMutex             sync.Mutex
+	UeNfProfile                    sync.Map
 }
 
 type UdmUeContext struct {
