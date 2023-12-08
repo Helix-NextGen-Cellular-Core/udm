@@ -36,6 +36,7 @@ func HandleUpdateRequest(request *http_wrapper.Request) *http_wrapper.Response {
 }
 
 func UpdateProcedure(updateRequest models.PpData, gpsi string) (problemDetails *models.ProblemDetails) {
+	// fmt.Println("UpdateProcedure: createUDMClientToUDR: gpsi: ", gpsi)
 	clientAPI, err := createUDMClientToUDR(gpsi)
 	if err != nil {
 		return util.ProblemDetailsSystemFailure(err.Error())

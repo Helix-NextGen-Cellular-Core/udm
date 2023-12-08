@@ -133,6 +133,7 @@ func ConfirmAuthDataProcedure(authEvent models.AuthEvent, supi string) (problemD
 	optInterface := optional.NewInterface(authEvent)
 	createAuthParam.AuthEvent = optInterface
 
+	// fmt.Println("ConfirmAuthDataProcedure: createUDMClientToUDR: supi: ", supi)
 	client, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return util.ProblemDetailsSystemFailure(err.Error())
@@ -178,6 +179,7 @@ func GenerateAuthDataProcedure(authInfoRequest models.AuthenticationInfoRequest,
 
 	logger.UeauLog.Tracef("supi conversion => %s\n", supi)
 
+	// fmt.Println("GenerateAuthDataProcedure: createUDMClientToUDR: supi: ", supi)
 	client, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())

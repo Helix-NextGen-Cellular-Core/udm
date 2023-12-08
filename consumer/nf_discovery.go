@@ -8,8 +8,9 @@ package consumer
 import (
 	"context"
 	"fmt"
-	"math"
+	"hash/fnv"
 	"net/http"
+	"sort"
 
 	"github.com/antihax/optional"
 	nrf_cache "github.com/omec-project/nrf/nrfcache"
@@ -108,6 +109,7 @@ func SendNFIntancesUDR(id string, types int) string {
 	Uenf, ok := self.UeNfProfile.Load(id)
 	if ok {
 		nf1 := Uenf.(*models.NfProfile)
+		// fmt.Println("for Ue: ", id, " found targetNfType ", string(models.NfType_UDR), " NF is: ", *nf1)
 		return util.SearchNFServiceUri(*nf1, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 	}
 	targetNfType := models.NfType_UDR
@@ -130,48 +132,51 @@ func SendNFIntancesUDR(id string, types int) string {
 		logger.Handlelog.Error(err.Error())
 		return ""
 	}
-	// nfInstanceIds := make([]string, 0, len(result.NfInstances))
-	// for _, profile := range result.NfInstances {
-	// 	nfInstanceIds = append(nfInstanceIds, profile.NfInstanceId)
-	// }
-	// sort.Strings(nfInstanceIds)
-
-	// nfInstanceIdIndexMap := make(map[string]int)
-	// for index, value := range nfInstanceIds {
-	// 	nfInstanceIdIndexMap[value] = index
-	// }
-	// nfInstanceIndex := 0
-	// if self.EnableScaling {
-	// 	h := fnv.New32a()
-	// 	h.Write([]byte(id))
-	// 	key := int(h.Sum32())
-	// 	nfInstanceIndex = key % len(result.NfInstances)
-	// }
-	// for _, profile := range result.NfInstances {
-	// 	if nfInstanceIndex != nfInstanceIdIndexMap[profile.NfInstanceId] {
-	// 		continue
-	// 	}
-	// 	//logge
-	// 	return util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
-	// }
-
-	min := int(math.MaxInt64)
-	nf := models.NfProfile{}
-	self.NfProfileListMutex.Lock()
-	if self.NfProfileList[models.NfType_UDR] == nil {
-		self.NfProfileList[models.NfType_UDR] = make(map[string]int)
+	nfInstanceIds := make([]string, 0, len(result.NfInstances))
+	for _, profile := range result.NfInstances {
+		nfInstanceIds = append(nfInstanceIds, profile.NfInstanceId)
 	}
-	for _, nfProfile := range result.NfInstances {
-		if self.NfProfileList[models.NfType_UDR][nfProfile.NfInstanceId] < min {
-			nf = nfProfile
-			min = self.NfProfileList[models.NfType_UDR][nfProfile.NfInstanceId]
+	sort.Strings(nfInstanceIds)
+
+	nfInstanceIdIndexMap := make(map[string]int)
+	for index, value := range nfInstanceIds {
+		nfInstanceIdIndexMap[value] = index
+	}
+	nfInstanceIndex := 0
+	if self.EnableScaling {
+		h := fnv.New32a()
+		h.Write([]byte(id))
+		key := int(h.Sum32())
+		nfInstanceIndex = key % len(result.NfInstances)
+	}
+	for _, profile := range result.NfInstances {
+		if nfInstanceIndex != nfInstanceIdIndexMap[profile.NfInstanceId] {
+			continue
 		}
-	}
-	self.NfProfileList[models.NfType_UDR][nf.NfInstanceId]++
-	count := self.NfProfileList[models.NfType_UDR][nf.NfInstanceId]
-	self.UeNfProfile.Store(id, &nf)
-	self.NfProfileListMutex.Unlock()
-	fmt.Println("for Ue: ", id, " for targetNfType ", string(models.NfType_UDR), " NF is: ", nf, "nf Count:", count)
+		self.UeNfProfile.Store(id, &profile)
+		fmt.Println("for Ue: ", id, " for targetNfType ", string(models.NfType_UDR), " NF is: ", profile)
 
-	return util.SearchNFServiceUri(nf, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
+		return util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
+	}
+
+	// min := int(math.MaxInt64)
+	// nf := models.NfProfile{}
+	// self.NfProfileListMutex.Lock()
+	// if self.NfProfileList[models.NfType_UDR] == nil {
+	// 	self.NfProfileList[models.NfType_UDR] = make(map[string]int)
+	// }
+	// for _, nfProfile := range result.NfInstances {
+	// 	if self.NfProfileList[models.NfType_UDR][nfProfile.NfInstanceId] < min {
+	// 		nf = nfProfile
+	// 		min = self.NfProfileList[models.NfType_UDR][nfProfile.NfInstanceId]
+	// 	}
+	// }
+	// self.NfProfileList[models.NfType_UDR][nf.NfInstanceId]++
+	// count := self.NfProfileList[models.NfType_UDR][nf.NfInstanceId]
+	// self.UeNfProfile.Store(id, &nf)
+	// self.NfProfileListMutex.Unlock()
+	// fmt.Println("for Ue: ", id, " for targetNfType ", string(models.NfType_UDR), " NF is: ", nf, "nf Count:", count)
+
+	// return util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
+	return ""
 }

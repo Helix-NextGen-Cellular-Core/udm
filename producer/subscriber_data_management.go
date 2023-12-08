@@ -56,6 +56,7 @@ func getAmDataProcedure(supi string, plmnID string, supportedFeatures string) (
 	var queryAmDataParamOpts Nudr.QueryAmDataParamOpts
 	queryAmDataParamOpts.SupportedFeatures = optional.NewString(supportedFeatures)
 
+	// fmt.Println("getAmDataProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -125,6 +126,7 @@ func getIdTranslationResultProcedure(gpsi string) (response *models.IdTranslatio
 	var idTranslationResult models.IdTranslationResult
 	var getIdentityDataParamOpts Nudr.GetIdentityDataParamOpts
 
+	// fmt.Println("getIdTranslationResultProcedure: createUDMClientToUDR: gpsi: ", gpsi)
 	clientAPI, err := createUDMClientToUDR(gpsi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -209,6 +211,7 @@ func HandleGetSupiRequest(request *http_wrapper.Request) *http_wrapper.Response 
 
 func getSupiProcedure(supi string, plmnID string, dataSetNames []string, supportedFeatures string) (
 	response *models.SubscriptionDataSets, problemDetails *models.ProblemDetails) {
+	// fmt.Println("getSupiProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -471,6 +474,7 @@ func HandleGetSharedDataRequest(request *http_wrapper.Request) *http_wrapper.Res
 
 func getSharedDataProcedure(sharedDataIds []string, supportedFeatures string) (
 	response []models.SharedData, problemDetails *models.ProblemDetails) {
+	// fmt.Println("getSharedDataProcedure: createUDMClientToUDR: empty")
 	clientAPI, err := createUDMClientToUDR("")
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -548,6 +552,7 @@ func getSmDataProcedure(supi string, plmnID string, Dnn string, Snssai string, s
 	response interface{}, problemDetails *models.ProblemDetails) {
 	logger.SdmLog.Infof("getSmDataProcedure: SUPI[%s] PLMNID[%s] DNN[%s] SNssai[%s]", supi, plmnID, Dnn, Snssai)
 
+	// fmt.Println("getSmDataProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -651,6 +656,7 @@ func getNssaiProcedure(supi string, plmnID string, supportedFeatures string) (
 	var queryAmDataParamOpts Nudr.QueryAmDataParamOpts
 	queryAmDataParamOpts.SupportedFeatures = optional.NewString(supportedFeatures)
 	var nssaiResp models.Nssai
+	// fmt.Println("getNssaiProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -727,6 +733,7 @@ func getSmfSelectDataProcedure(supi string, plmnID string, supportedFeatures str
 	querySmfSelectDataParamOpts.SupportedFeatures = optional.NewString(supportedFeatures)
 	var body models.SmfSelectionSubscriptionData
 
+	// fmt.Println("getSmfSelectDataProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -866,6 +873,7 @@ func HandleSubscribeRequest(request *http_wrapper.Request) *http_wrapper.Respons
 
 func subscribeProcedure(sdmSubscription *models.SdmSubscription, supi string) (
 	header http.Header, response *models.SdmSubscription, problemDetails *models.ProblemDetails) {
+	// fmt.Println("subscribeProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -991,6 +999,7 @@ func HandleUnsubscribeRequest(request *http_wrapper.Request) *http_wrapper.Respo
 }
 
 func unsubscribeProcedure(supi string, subscriptionID string) *models.ProblemDetails {
+	// fmt.Println("unsubscribeProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return util.ProblemDetailsSystemFailure(err.Error())
@@ -1057,6 +1066,7 @@ func HandleModifyRequest(request *http_wrapper.Request) *http_wrapper.Response {
 
 func modifyProcedure(sdmSubsModification *models.SdmSubsModification, supi string, subscriptionID string) (
 	response *models.SdmSubscription, problemDetails *models.ProblemDetails) {
+	// fmt.Println("modifyProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -1128,6 +1138,7 @@ func HandleModifyForSharedDataRequest(request *http_wrapper.Request) *http_wrapp
 
 func modifyForSharedDataProcedure(sdmSubsModification *models.SdmSubsModification, supi string,
 	subscriptionID string) (response *models.SdmSubscription, problemDetails *models.ProblemDetails) {
+	// fmt.Println("modifyForSharedDataProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -1203,6 +1214,7 @@ func getTraceDataProcedure(supi string, plmnID string) (
 	var body models.TraceData
 	var queryTraceDataParamOpts Nudr.QueryTraceDataParamOpts
 
+	// fmt.Println("getTraceDataProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -1283,6 +1295,7 @@ func getUeContextInSmfDataProcedure(supi string, supportedFeatures string) (
 	var querySmfRegListParamOpts Nudr.QuerySmfRegListParamOpts
 	querySmfRegListParamOpts.SupportedFeatures = optional.NewString(supportedFeatures)
 
+	// fmt.Println("getUeContextInSmfDataProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
