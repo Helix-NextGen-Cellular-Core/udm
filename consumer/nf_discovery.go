@@ -109,7 +109,7 @@ func SendNFIntancesUDR(id string, types int) string {
 	Uenf, ok := self.UeNfProfile.Load(id)
 	if ok {
 		nf1 := Uenf.(*models.NfProfile)
-		// fmt.Println("for Ue: ", id, " found targetNfType ", string(models.NfType_UDR), " NF is: ", *nf1)
+		logger.ConsumerLog.Warnln("for Ue: ", id, " found targetNfType ", string(models.NfType_UDR), " NF is: ", *nf1)
 		return util.SearchNFServiceUri(*nf1, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 	}
 	targetNfType := models.NfType_UDR
@@ -154,7 +154,7 @@ func SendNFIntancesUDR(id string, types int) string {
 			continue
 		}
 		self.UeNfProfile.Store(id, &profile)
-		fmt.Println("for Ue: ", id, " for targetNfType ", string(models.NfType_UDR), " NF is: ", profile)
+		logger.ConsumerLog.Warnln("for Ue: ", id, " for targetNfType ", string(models.NfType_UDR), " NF is: ", profile)
 
 		return util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 	}
@@ -175,7 +175,7 @@ func SendNFIntancesUDR(id string, types int) string {
 	// count := self.NfProfileList[models.NfType_UDR][nf.NfInstanceId]
 	// self.UeNfProfile.Store(id, &nf)
 	// self.NfProfileListMutex.Unlock()
-	// fmt.Println("for Ue: ", id, " for targetNfType ", string(models.NfType_UDR), " NF is: ", nf, "nf Count:", count)
+	// logger.ConsumerLog.Warnln("for Ue: ", id, " for targetNfType ", string(models.NfType_UDR), " NF is: ", nf, "nf Count:", count)
 
 	// return util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 	return ""

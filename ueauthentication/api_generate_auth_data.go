@@ -28,6 +28,11 @@ import (
 
 // GenerateAuthData - Generate authentication data for the UE
 func HttpGenerateAuthData(c *gin.Context) {
+	// st := time.Now().UnixNano()
+	// defer func(st int64) {
+	// 	logger.UeauLog.Infoln("HttpGenerateAuthData took: ", time.Now().UnixNano()-st)
+	// }(st)
+
 	var authInfoReq models.AuthenticationInfoRequest
 
 	// step 1: retrieve http request body
