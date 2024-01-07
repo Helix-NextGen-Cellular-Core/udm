@@ -8,9 +8,10 @@ package consumer
 import (
 	"context"
 	"fmt"
-	"hash/fnv"
 	"net/http"
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/antihax/optional"
 	nrf_cache "github.com/omec-project/nrf/nrfcache"
@@ -144,17 +145,20 @@ func SendNFIntancesUDR(id string, types int) string {
 	}
 	nfInstanceIndex := 0
 	if self.EnableScaling {
-		h := fnv.New32a()
-		h.Write([]byte(id))
-		key := int(h.Sum32())
-		nfInstanceIndex = key % len(result.NfInstances)
+		// h := fnv.New32a()
+		// h.Write([]byte(id))
+		// key := int(h.Sum32())
+		// nfInstanceIndex = key % len(result.NfInstances)
+		parts := strings.Split(id, "-")
+		imsiNumber, _ := strconv.Atoi(parts[1])
+		nfInstanceIndex = imsiNumber % len(result.NfInstances)
 	}
 	for _, profile := range result.NfInstances {
 		if nfInstanceIndex != nfInstanceIdIndexMap[profile.NfInstanceId] {
 			continue
 		}
 		self.UeNfProfile.Store(id, &profile)
-		logger.ConsumerLog.Warnln("for Ue: ", id, " for targetNfType ", string(models.NfType_UDR), " NF is: ", profile)
+		logger.ConsumerLog.Warnln("for Ue: ", id, " nfInstanceIndex: ", nfInstanceIndex, " for targetNfType ", string(models.NfType_UDR), " NF is: ", profile)
 
 		return util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 	}
