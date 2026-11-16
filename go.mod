@@ -2,7 +2,7 @@ module github.com/omec-project/udm
 
 go 1.16
 
-replace github.com/omec-project/nrf => ../nrf
+replace github.com/omec-project/nrf => github.com/Helix-NextGen-Cellular-Core/nrf v1.0.0
 
 require (
 	github.com/antihax/optional v1.0.0
