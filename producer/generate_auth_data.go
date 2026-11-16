@@ -90,7 +90,6 @@ func strictHex(s string, n int) string {
 
 func HandleGenerateAuthDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	// logger.UeauLog.Infoln("Handle GenerateAuthDataRequest")
 	// step 2: retrieve request
 	authInfoRequest := request.Body.(models.AuthenticationInfoRequest)
 	supiOrSuci := request.Params["supiOrSuci"]
@@ -113,13 +112,10 @@ func HandleGenerateAuthDataRequest(request *http_wrapper.Request) *http_wrapper.
 }
 
 func HandleConfirmAuthDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
-	// logger.UeauLog.Infoln("Handle ConfirmAuthDataRequest")
-	// st := time.Now().UnixNano()
 	authEvent := request.Body.(models.AuthEvent)
 	supi := request.Params["supi"]
 
 	problemDetails := ConfirmAuthDataProcedure(authEvent, supi)
-	// logger.UeauLog.Infof("ueID %v HandleConfirmAuthDataRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	if problemDetails != nil {
 		return http_wrapper.NewResponse(int(problemDetails.Status), nil, problemDetails)
 	} else {
@@ -132,7 +128,6 @@ func ConfirmAuthDataProcedure(authEvent models.AuthEvent, supi string) (problemD
 	optInterface := optional.NewInterface(authEvent)
 	createAuthParam.AuthEvent = optInterface
 
-	// fmt.Println("ConfirmAuthDataProcedure: createUDMClientToUDR: supi: ", supi)
 	client, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return util.ProblemDetailsSystemFailure(err.Error())
@@ -163,10 +158,6 @@ func GenerateAuthDataProcedure(authInfoRequest models.AuthenticationInfoRequest,
 	response *models.AuthenticationInfoResult, problemDetails *models.ProblemDetails) {
 	logger.UeauLog.Traceln("In GenerateAuthDataProcedure")
 
-	// defer func(st int64) {
-	// 	logger.UeauLog.Warnln("ueID ", supiOrSuci, " GenerateAuthDataProcedure took: ", (time.Now().UnixNano() - st))
-	// }(time.Now().UnixNano())
-
 	response = &models.AuthenticationInfoResult{}
 	rand.Seed(time.Now().UnixNano())
 	supi, err := suci.ToSupi(supiOrSuci, udm_context.UDM_Self().GetUdmProfileAHNPrivateKey())
@@ -189,7 +180,6 @@ func GenerateAuthDataProcedure(authInfoRequest models.AuthenticationInfoRequest,
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
 	}
 
-	// st := time.Now().UnixNano()
 	authSubs, res, err := client.AuthenticationDataDocumentApi.QueryAuthSubsData(context.Background(), supi, nil)
 	if err != nil {
 		problemDetails = &models.ProblemDetails{
@@ -202,7 +192,6 @@ func GenerateAuthDataProcedure(authInfoRequest models.AuthenticationInfoRequest,
 		return nil, problemDetails
 	}
 
-	// logger.UeauLog.Warnln("ueID ", supi, " AuthenticationDataDocumentApi-QueryAuthSubsData took: ", (time.Now().UnixNano() - st))
 	defer func() {
 		if rspCloseErr := res.Body.Close(); rspCloseErr != nil {
 			logger.SdmLog.Errorf("QueryAuthSubsData response body cannot close: %+v", rspCloseErr)
@@ -411,7 +400,6 @@ func GenerateAuthDataProcedure(authInfoRequest models.AuthenticationInfoRequest,
 			// increment sqn authSubs.SequenceNumber
 			bigSQN := big.NewInt(0)
 			sqnStr = hex.EncodeToString(SQNms)
-			// fmt.Printf("SQNstr %s\n", sqnStr)
 			bigSQN.SetString(sqnStr, 16)
 
 			bigInc := big.NewInt(ind + 1)
@@ -511,7 +499,6 @@ func GenerateAuthDataProcedure(authInfoRequest models.AuthenticationInfoRequest,
 	}
 	// fmt.Printf("SQN xor AK = %x\n", SQNxorAK)
 	AUTN := append(append(SQNxorAK, AMF...), macA...)
-	// fmt.Printf("AUTN = %x\n", AUTN)
 
 	var av models.AuthenticationVector
 	if authSubs.AuthenticationMethod == models.AuthMethod__5_G_AKA {

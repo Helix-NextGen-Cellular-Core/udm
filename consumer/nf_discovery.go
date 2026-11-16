@@ -29,30 +29,6 @@ const (
 	NFDiscoveryToUDRParamGpsi
 )
 
-// func SendNFIntances(nrfUri string, targetNfType, requestNfType models.NfType,
-// 	param Nnrf_NFDiscovery.SearchNFInstancesParamOpts) (result models.SearchResult, err error) {
-// 	configuration := Nnrf_NFDiscovery.NewConfiguration()
-// 	configuration.SetBasePath(nrfUri) // addr
-// 	clientNRF := Nnrf_NFDiscovery.NewAPIClient(configuration)
-
-// 	result, res, err1 := clientNRF.NFInstancesStoreApi.SearchNFInstances(context.TODO(), targetNfType,
-// 		requestNfType, &param)
-// 	if err1 != nil {
-// 		err = err1
-// 		return
-// 	}
-// 	defer func() {
-// 		if rspCloseErr := res.Body.Close(); rspCloseErr != nil {
-// 			logger.Handlelog.Errorf("SearchNFInstances response body cannot close: %+v", rspCloseErr)
-// 		}
-// 	}()
-
-// 	if res != nil && res.StatusCode == http.StatusTemporaryRedirect {
-// 		err = fmt.Errorf("Temporary Redirect For Non NRF Consumer")
-// 	}
-// 	return
-// }
-
 func SendNFInstances(nrfUri string, targetNfType, requestNfType models.NfType,
 	param *Nnrf_NFDiscovery.SearchNFInstancesParamOpts) (models.SearchResult, error) {
 	if udm_context.UDM_Self().EnableNrfCaching {
@@ -127,7 +103,6 @@ func SendNFIntancesUDR(id string, types int) string {
 	// case NFDiscoveryToUDRParamGpsi:
 	// 	localVarOptionals.Gpsi = optional.NewString(id)
 	// }
-	// fmt.Println(self.NrfUri)
 	result, err := SendNFInstances(self.NrfUri, targetNfType, requestNfType, &localVarOptionals)
 	if err != nil {
 		logger.Handlelog.Error(err.Error())
@@ -145,10 +120,6 @@ func SendNFIntancesUDR(id string, types int) string {
 	}
 	nfInstanceIndex := 0
 	if self.EnableScaling {
-		// h := fnv.New32a()
-		// h.Write([]byte(id))
-		// key := int(h.Sum32())
-		// nfInstanceIndex = key % len(result.NfInstances)
 		parts := strings.Split(id, "-")
 		imsiNumber, _ := strconv.Atoi(parts[1])
 		nfInstanceIndex = imsiNumber % len(result.NfInstances)
@@ -163,24 +134,5 @@ func SendNFIntancesUDR(id string, types int) string {
 		return util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 	}
 
-	// min := int(math.MaxInt64)
-	// nf := models.NfProfile{}
-	// self.NfProfileListMutex.Lock()
-	// if self.NfProfileList[models.NfType_UDR] == nil {
-	// 	self.NfProfileList[models.NfType_UDR] = make(map[string]int)
-	// }
-	// for _, nfProfile := range result.NfInstances {
-	// 	if self.NfProfileList[models.NfType_UDR][nfProfile.NfInstanceId] < min {
-	// 		nf = nfProfile
-	// 		min = self.NfProfileList[models.NfType_UDR][nfProfile.NfInstanceId]
-	// 	}
-	// }
-	// self.NfProfileList[models.NfType_UDR][nf.NfInstanceId]++
-	// count := self.NfProfileList[models.NfType_UDR][nf.NfInstanceId]
-	// self.UeNfProfile.Store(id, &nf)
-	// self.NfProfileListMutex.Unlock()
-	// logger.ConsumerLog.Warnln("for Ue: ", id, " for targetNfType ", string(models.NfType_UDR), " NF is: ", nf, "nf Count:", count)
-
-	// return util.SearchNFServiceUri(profile, models.ServiceName_NUDR_DR, models.NfServiceStatus_REGISTERED)
 	return ""
 }

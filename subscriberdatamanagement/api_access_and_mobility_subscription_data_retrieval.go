@@ -28,7 +28,6 @@ import (
 
 // GetAmData - retrieve a UE's Access and Mobility Subscription Data
 func HTTPGetAmData(c *gin.Context) {
-	// st := time.Now().UnixNano()
 	req := http_wrapper.NewRequest(c.Request, nil)
 	req.Params["supi"] = c.Params.ByName("supi")
 	req.Query.Set("plmn-id", c.Query("plmn-id"))
@@ -46,8 +45,6 @@ func HTTPGetAmData(c *gin.Context) {
 		}
 		c.JSON(http.StatusInternalServerError, problemDetails)
 	} else {
-		// et := time.Now().UnixNano()
-		// logger.SdmLog.Infoln("GetAmData takes ", et-st, " ns")
 		c.Data(rsp.Status, "application/json", responseBody)
 	}
 }

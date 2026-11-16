@@ -26,9 +26,6 @@ import (
 )
 
 func createUDMClientToUDR(id string) (*Nudr_DataRepository.APIClient, error) {
-	// defer func(st int64) {
-	// 	logger.UecmLog.Warnln("ueID ", id, " createUDMClientToUDR took: ", (time.Now().UnixNano() - st))
-	// }(time.Now().UnixNano())
 
 	uri := getUdrURI(id)
 	if uri == "" {
@@ -46,12 +43,10 @@ func getUdrURI(id string) string {
 		ue, ok := udm_context.UDM_Self().UdmUeFindBySupi(id)
 		if ok {
 			if ue.UdrUri == "" {
-				// fmt.Println("SendNFIntancesUDR: ue found ", id)
 				ue.UdrUri = consumer.SendNFIntancesUDR(id, consumer.NFDiscoveryToUDRParamSupi)
 			}
 			return ue.UdrUri
 		} else {
-			// fmt.Println("SendNFIntancesUDR: ue not found ", id)
 			ue = udm_context.UDM_Self().NewUdmUe(id)
 			ue.UdrUri = consumer.SendNFIntancesUDR(id, consumer.NFDiscoveryToUDRParamSupi)
 			return ue.UdrUri
@@ -62,14 +57,12 @@ func getUdrURI(id string) string {
 			ue := value.(*udm_context.UdmUeContext)
 			if ue.Amf3GppAccessRegistration != nil && ue.Amf3GppAccessRegistration.Pei == id {
 				if ue.UdrUri == "" {
-					// fmt.Println("SendNFIntancesUDR: pei 1 ", id)
 					ue.UdrUri = consumer.SendNFIntancesUDR(ue.Supi, consumer.NFDiscoveryToUDRParamSupi)
 				}
 				udrURI = ue.UdrUri
 				return false
 			} else if ue.AmfNon3GppAccessRegistration != nil && ue.AmfNon3GppAccessRegistration.Pei == id {
 				if ue.UdrUri == "" {
-					// fmt.Println("SendNFIntancesUDR: pei 2 ", id)
 					ue.UdrUri = consumer.SendNFIntancesUDR(ue.Supi, consumer.NFDiscoveryToUDRParamSupi)
 				}
 				udrURI = ue.UdrUri
@@ -80,14 +73,11 @@ func getUdrURI(id string) string {
 		return udrURI
 	} else if strings.Contains(id, "extgroupid") {
 		// extra group id
-		// fmt.Println("SendNFIntancesUDR: extgroupid ", id)
 		return consumer.SendNFIntancesUDR(id, consumer.NFDiscoveryToUDRParamExtGroupId)
 	} else if strings.Contains(id, "msisdn") || strings.Contains(id, "extid") {
 		// gpsi
-		// fmt.Println("SendNFIntancesUDR: msisdn|extid ", id)
 		return consumer.SendNFIntancesUDR(id, consumer.NFDiscoveryToUDRParamGpsi)
 	}
-	// fmt.Println("SendNFIntancesUDR: empty id ", id)
 	return consumer.SendNFIntancesUDR("", consumer.NFDiscoveryToUDRParamNone)
 }
 
@@ -120,7 +110,6 @@ func GetAmf3gppAccessProcedure(ueID string, supportedFeatures string) (
 	response *models.Amf3GppAccessRegistration, problemDetails *models.ProblemDetails) {
 	var queryAmfContext3gppParamOpts Nudr_DataRepository.QueryAmfContext3gppParamOpts
 	queryAmfContext3gppParamOpts.SupportedFeatures = optional.NewString(supportedFeatures)
-	// fmt.Println("GetAmf3gppAccessProcedure: createUDMClientToUDR: ueID: ", ueID)
 	clientAPI, err := createUDMClientToUDR(ueID)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -175,7 +164,6 @@ func HandleGetAmfNon3gppAccessRequest(request *http_wrapper.Request) *http_wrapp
 func GetAmfNon3gppAccessProcedure(queryAmfContextNon3gppParamOpts Nudr_DataRepository.
 	QueryAmfContextNon3gppParamOpts, ueID string) (response *models.AmfNon3GppAccessRegistration,
 	problemDetails *models.ProblemDetails) {
-	// fmt.Println("GetAmfNon3gppAccessProcedure: createUDMClientToUDR: ueID: ", ueID)
 	clientAPI, err := createUDMClientToUDR(ueID)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -202,8 +190,6 @@ func GetAmfNon3gppAccessProcedure(queryAmfContextNon3gppParamOpts Nudr_DataRepos
 
 func HandleRegistrationAmf3gppAccessRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	// logger.UecmLog.Infof("Handle RegistrationAmf3gppAccess")
-	// st := time.Now().UnixNano()
 	// step 2: retrieve request
 	registerRequest := request.Body.(models.Amf3GppAccessRegistration)
 	ueID := request.Params["ueId"]
@@ -211,7 +197,6 @@ func HandleRegistrationAmf3gppAccessRequest(request *http_wrapper.Request) *http
 
 	// step 3: handle the message
 	header, response, problemDetails := RegistrationAmf3gppAccessProcedure(registerRequest, ueID)
-	// logger.UecmLog.Infof("ueID %v HandleRegistrationAmf3gppAccessRequest took: %d ", ueID, (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -235,7 +220,6 @@ func RegistrationAmf3gppAccessProcedure(registerRequest models.Amf3GppAccessRegi
 
 	udm_context.UDM_Self().CreateAmf3gppRegContext(ueID, registerRequest)
 
-	// fmt.Println("RegistrationAmf3gppAccessProcedure: createUDMClientToUDR: ueID: ", ueID)
 	clientAPI, err := createUDMClientToUDR(ueID)
 	if err != nil {
 		return nil, nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -313,7 +297,6 @@ func RegisterAmfNon3gppAccessProcedure(registerRequest models.AmfNon3GppAccessRe
 
 	udm_context.UDM_Self().CreateAmfNon3gppRegContext(ueID, registerRequest)
 
-	// fmt.Println("RegisterAmfNon3gppAccessProcedure: createUDMClientToUDR: ueID: ", ueID)
 	clientAPI, err := createUDMClientToUDR(ueID)
 	if err != nil {
 		return nil, nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -443,7 +426,6 @@ func UpdateAmf3gppAccessProcedure(request models.Amf3GppAccessRegistrationModifi
 		patchItemReqArray = append(patchItemReqArray, patchItemTmp)
 	}
 
-	// fmt.Println("UpdateAmf3gppAccessProcedure: createUDMClientToUDR: ueID: ", ueID)
 	clientAPI, err := createUDMClientToUDR(ueID)
 	if err != nil {
 		return util.ProblemDetailsSystemFailure(err.Error())
@@ -554,7 +536,6 @@ func UpdateAmfNon3gppAccessProcedure(request models.AmfNon3GppAccessRegistration
 		patchItemReqArray = append(patchItemReqArray, patchItemTmp)
 	}
 
-	// fmt.Println("UpdateAmfNon3gppAccessProcedure: createUDMClientToUDR: ueID: ", ueID)
 	clientAPI, err := createUDMClientToUDR(ueID)
 	if err != nil {
 		return util.ProblemDetailsSystemFailure(err.Error())
@@ -599,7 +580,6 @@ func HandleDeregistrationSmfRegistrations(request *http_wrapper.Request) *http_w
 }
 
 func DeregistrationSmfRegistrationsProcedure(ueID string, pduSessionID string) (problemDetails *models.ProblemDetails) {
-	// fmt.Println("DeregistrationSmfRegistrationsProcedure: createUDMClientToUDR: ueID: ", ueID)
 	clientAPI, err := createUDMClientToUDR(ueID)
 	if err != nil {
 		return util.ProblemDetailsSystemFailure(err.Error())
@@ -667,7 +647,6 @@ func RegistrationSmfRegistrationsProcedure(request *models.SmfRegistration, ueID
 	optInterface := optional.NewInterface(request)
 	createSmfContextNon3gppParamOpts.SmfRegistration = optInterface
 
-	// fmt.Println("RegistrationSmfRegistrationsProcedure: createUDMClientToUDR: ueID: ", ueID)
 	clientAPI, err := createUDMClientToUDR(ueID)
 	if err != nil {
 		return nil, nil, util.ProblemDetailsSystemFailure(err.Error())

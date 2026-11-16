@@ -25,8 +25,6 @@ import (
 
 func HandleGetAmDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	// logger.SdmLog.Infof("Handle GetAmData")
-	// st := time.Now().UnixNano()
 	// step 2: retrieve request
 	supi := request.Params["supi"]
 	plmnID := request.Query.Get("plmn-id")
@@ -34,7 +32,6 @@ func HandleGetAmDataRequest(request *http_wrapper.Request) *http_wrapper.Respons
 
 	// step 3: handle the message
 	response, problemDetails := getAmDataProcedure(supi, plmnID, supportedFeatures)
-	// logger.SdmLog.Infof("supi %v HandleGetAmDataRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -54,9 +51,6 @@ func getAmDataProcedure(supi string, plmnID string, supportedFeatures string) (
 	response *models.AccessAndMobilitySubscriptionData, problemDetails *models.ProblemDetails) {
 	var queryAmDataParamOpts Nudr.QueryAmDataParamOpts
 	queryAmDataParamOpts.SupportedFeatures = optional.NewString(supportedFeatures)
-	// defer func(st int64) {
-	// 	logger.UeauLog.Warnln("ueID ", supi, " getAmDataProcedure took: ", (time.Now().UnixNano() - st))
-	// }(time.Now().UnixNano())
 
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
@@ -127,7 +121,6 @@ func getIdTranslationResultProcedure(gpsi string) (response *models.IdTranslatio
 	var idTranslationResult models.IdTranslationResult
 	var getIdentityDataParamOpts Nudr.GetIdentityDataParamOpts
 
-	// fmt.Println("getIdTranslationResultProcedure: createUDMClientToUDR: gpsi: ", gpsi)
 	clientAPI, err := createUDMClientToUDR(gpsi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -212,7 +205,6 @@ func HandleGetSupiRequest(request *http_wrapper.Request) *http_wrapper.Response 
 
 func getSupiProcedure(supi string, plmnID string, dataSetNames []string, supportedFeatures string) (
 	response *models.SubscriptionDataSets, problemDetails *models.ProblemDetails) {
-	// fmt.Println("getSupiProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -475,7 +467,6 @@ func HandleGetSharedDataRequest(request *http_wrapper.Request) *http_wrapper.Res
 
 func getSharedDataProcedure(sharedDataIds []string, supportedFeatures string) (
 	response []models.SharedData, problemDetails *models.ProblemDetails) {
-	// fmt.Println("getSharedDataProcedure: createUDMClientToUDR: empty")
 	clientAPI, err := createUDMClientToUDR("")
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -553,7 +544,6 @@ func getSmDataProcedure(supi string, plmnID string, Dnn string, Snssai string, s
 	response interface{}, problemDetails *models.ProblemDetails) {
 	logger.SdmLog.Infof("getSmDataProcedure: SUPI[%s] PLMNID[%s] DNN[%s] SNssai[%s]", supi, plmnID, Dnn, Snssai)
 
-	// fmt.Println("getSmDataProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -628,8 +618,6 @@ func getSmDataProcedure(supi string, plmnID string, Dnn string, Snssai string, s
 
 func HandleGetNssaiRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	// logger.SdmLog.Infof("Handle GetNssai")
-	// st := time.Now().UnixNano()
 	// step 2: retrieve request
 	supi := request.Params["supi"]
 	plmnID := request.Query.Get("plmn-id")
@@ -637,7 +625,6 @@ func HandleGetNssaiRequest(request *http_wrapper.Request) *http_wrapper.Response
 
 	// step 3: handle the message
 	response, problemDetails := getNssaiProcedure(supi, plmnID, supportedFeatures)
-	// logger.SdmLog.Infof("ueID %v HandleGetNssaiRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -657,7 +644,6 @@ func getNssaiProcedure(supi string, plmnID string, supportedFeatures string) (
 	var queryAmDataParamOpts Nudr.QueryAmDataParamOpts
 	queryAmDataParamOpts.SupportedFeatures = optional.NewString(supportedFeatures)
 	var nssaiResp models.Nssai
-	// fmt.Println("getNssaiProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -704,8 +690,6 @@ func getNssaiProcedure(supi string, plmnID string, supportedFeatures string) (
 
 func HandleGetSmfSelectDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	// logger.SdmLog.Infof("Handle GetSmfSelectData")
-	// st := time.Now().UnixNano()
 	// step 2: retrieve request
 	supi := request.Params["supi"]
 	plmnID := request.Query.Get("plmn-id")
@@ -713,7 +697,6 @@ func HandleGetSmfSelectDataRequest(request *http_wrapper.Request) *http_wrapper.
 
 	// step 3: handle the message
 	response, problemDetails := getSmfSelectDataProcedure(supi, plmnID, supportedFeatures)
-	// logger.SdmLog.Infof("ueID %v HandleGetSmfSelectDataRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -733,9 +716,6 @@ func getSmfSelectDataProcedure(supi string, plmnID string, supportedFeatures str
 	var querySmfSelectDataParamOpts Nudr.QuerySmfSelectDataParamOpts
 	querySmfSelectDataParamOpts.SupportedFeatures = optional.NewString(supportedFeatures)
 	var body models.SmfSelectionSubscriptionData
-	// defer func(st int64) {
-	// 	logger.UeauLog.Warnln("ueID ", supi, " getSmfSelectDataProcedure took: ", (time.Now().UnixNano() - st))
-	// }(time.Now().UnixNano())
 
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
@@ -783,14 +763,11 @@ func getSmfSelectDataProcedure(supi string, plmnID string, supportedFeatures str
 
 func HandleSubscribeToSharedDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	// logger.SdmLog.Infof("Handle SubscribeToSharedData")
-	// st := time.Now().UnixNano()
 	// step 2: retrieve request
 	sdmSubscription := request.Body.(models.SdmSubscription)
 
 	// step 3: handle the message
 	header, response, problemDetails := subscribeToSharedDataProcedure(&sdmSubscription)
-	// logger.SdmLog.Infof("ueID %v HandleSubscribeToSharedDataRequest took: %d ", (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -854,15 +831,12 @@ func subscribeToSharedDataProcedure(sdmSubscription *models.SdmSubscription) (
 
 func HandleSubscribeRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	// logger.SdmLog.Infof("Handle Subscribe")
-	// st := time.Now().UnixNano()
 	// step 2: retrieve request
 	sdmSubscription := request.Body.(models.SdmSubscription)
 	supi := request.Params["supi"]
 
 	// step 3: handle the message
 	header, response, problemDetails := subscribeProcedure(&sdmSubscription, supi)
-	// logger.SdmLog.Infof("ueID %v HandleSubscribeRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	// step 4: process the return value from step 3
 	if response != nil {
 		// status code is based on SPEC, and option headers
@@ -876,9 +850,6 @@ func HandleSubscribeRequest(request *http_wrapper.Request) *http_wrapper.Respons
 
 func subscribeProcedure(sdmSubscription *models.SdmSubscription, supi string) (
 	header http.Header, response *models.SdmSubscription, problemDetails *models.ProblemDetails) {
-	// defer func(st int64) {
-	// 	logger.UeauLog.Warnln("ueID ", supi, " subscribeProcedure took: ", (time.Now().UnixNano() - st))
-	// }(time.Now().UnixNano())
 
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
@@ -1005,7 +976,6 @@ func HandleUnsubscribeRequest(request *http_wrapper.Request) *http_wrapper.Respo
 }
 
 func unsubscribeProcedure(supi string, subscriptionID string) *models.ProblemDetails {
-	// fmt.Println("unsubscribeProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return util.ProblemDetailsSystemFailure(err.Error())
@@ -1072,7 +1042,6 @@ func HandleModifyRequest(request *http_wrapper.Request) *http_wrapper.Response {
 
 func modifyProcedure(sdmSubsModification *models.SdmSubsModification, supi string, subscriptionID string) (
 	response *models.SdmSubscription, problemDetails *models.ProblemDetails) {
-	// fmt.Println("modifyProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -1144,7 +1113,6 @@ func HandleModifyForSharedDataRequest(request *http_wrapper.Request) *http_wrapp
 
 func modifyForSharedDataProcedure(sdmSubsModification *models.SdmSubsModification, supi string,
 	subscriptionID string) (response *models.SdmSubscription, problemDetails *models.ProblemDetails) {
-	// fmt.Println("modifyForSharedDataProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -1220,7 +1188,6 @@ func getTraceDataProcedure(supi string, plmnID string) (
 	var body models.TraceData
 	var queryTraceDataParamOpts Nudr.QueryTraceDataParamOpts
 
-	// fmt.Println("getTraceDataProcedure: createUDMClientToUDR: supi: ", supi)
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
 		return nil, util.ProblemDetailsSystemFailure(err.Error())
@@ -1269,8 +1236,6 @@ func getTraceDataProcedure(supi string, plmnID string) (
 
 func HandleGetUeContextInSmfDataRequest(request *http_wrapper.Request) *http_wrapper.Response {
 	// step 1: log
-	// logger.SdmLog.Infof("Handle GetUeContextInSmfData")
-	// st := time.Now().UnixNano()
 	// step 2: retrieve request
 	supi := request.Params["supi"]
 	supportedFeatures := request.Query.Get("supported-features")
@@ -1289,7 +1254,6 @@ func HandleGetUeContextInSmfDataRequest(request *http_wrapper.Request) *http_wra
 		Status: http.StatusForbidden,
 		Cause:  "UNSPECIFIED",
 	}
-	// logger.SdmLog.Infof("ueID %v HandleGetUeContextInSmfDataRequest took: %d ", supi, (time.Now().UnixNano() - st))
 	return http_wrapper.NewResponse(http.StatusForbidden, nil, problemDetails)
 }
 
@@ -1300,9 +1264,6 @@ func getUeContextInSmfDataProcedure(supi string, supportedFeatures string) (
 	var pgwInfoArray []models.PgwInfo
 	var querySmfRegListParamOpts Nudr.QuerySmfRegListParamOpts
 	querySmfRegListParamOpts.SupportedFeatures = optional.NewString(supportedFeatures)
-	// defer func(st int64) {
-	// 	logger.UeauLog.Warnln("ueID ", supi, " getUeContextInSmfDataProcedure took: ", (time.Now().UnixNano() - st))
-	// }(time.Now().UnixNano())
 
 	clientAPI, err := createUDMClientToUDR(supi)
 	if err != nil {
