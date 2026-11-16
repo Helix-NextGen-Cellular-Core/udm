@@ -1,7 +1,7 @@
 # Builds the Helix image ghcr.io/helix-nextgen-cellular-core/udm:v1.0.0
 # the same way it was built and verified:
 #   docker build -t udm:local .
-FROM golang:1.16.0-stretch AS builder
+FROM golang:1.18.3-stretch AS builder
 WORKDIR /go/src/udm
 COPY . .
 RUN go mod vendor \
